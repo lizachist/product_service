@@ -23,6 +23,7 @@ func NewProductService(
 
 func (p *ProductService) Create(product *domain.Product) error {
 	p.logger.Info("Creating new product", "name", product.Name, "categoryID", *product.CategoryID)
+
 	_, err := p.categoryRepo.GetByID(*product.CategoryID)
 	if err != nil {
 		p.logger.Error("Invalid category ID", "error", err, "categoryID", *product.CategoryID)
@@ -33,12 +34,14 @@ func (p *ProductService) Create(product *domain.Product) error {
 		p.logger.Error("Failed to create product", "error", err)
 		return err
 	}
+
 	p.logger.Info("Product created successfully", "productID", product.ID)
 	return nil
 }
 
 func (p *ProductService) Update(product *domain.Product) error {
 	p.logger.Info("Updating product", "productID", product.ID)
+
 	existingProduct, err := p.productRepo.GetByID(product.ID)
 	if err != nil {
 		p.logger.Error("Failed to get existing product", "error", err, "productID", product.ID)
@@ -56,17 +59,51 @@ func (p *ProductService) Update(product *domain.Product) error {
 	}
 	existingProduct.IsActive = product.IsActive
 
-	return p.productRepo.Update(existingProduct)
+	err = p.productRepo.Update(existingProduct)
+	if err != nil {
+		p.logger.Error("Failed to update product", "error", err, "productID", product.ID)
+		return err
+	}
+
+	p.logger.Info("Product updated successfully", "productID", product.ID)
+	return nil
 }
 
 func (p *ProductService) Delete(product *domain.Product) error {
-	return p.productRepo.Delete(product)
+	p.logger.Info("Deleting product", "productID", product.ID)
+
+	err := p.productRepo.Delete(product)
+	if err != nil {
+		p.logger.Error("Failed to delete product", "error", err, "productID", product.ID)
+		return err
+	}
+
+	p.logger.Info("Product deleted successfully", "productID", product.ID)
+	return nil
 }
 
 func (p *ProductService) GetByID(id int) (*domain.Product, error) {
-	return p.productRepo.GetByID(id)
+	p.logger.Info("Getting product by ID", "productID", id)
+
+	product, err := p.productRepo.GetByID(id)
+	if err != nil {
+		p.logger.Error("Failed to get product", "error", err, "productID", id)
+		return nil, err
+	}
+
+	p.logger.Info("Product retrieved successfully", "productID", id)
+	return product, nil
 }
 
 func (p *ProductService) GetAll() ([]*domain.Product, error) {
-	return p.productRepo.GetAll()
+	p.logger.Info("Getting all products")
+
+	products, err := p.productRepo.GetAll()
+	if err != nil {
+		p.logger.Error("Failed to get all products", "error", err)
+		return nil, err
+	}
+
+	p.logger.Info("All products retrieved successfully", "count", len(products))
+	return products, nil
 }

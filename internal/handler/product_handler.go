@@ -35,6 +35,7 @@ func (h *ProductHandler) Register(e *echo.Echo) {
 
 func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	h.logger.Info("Handling CreateProduct request")
+
 	user := new(domain.Product)
 	if err := c.Bind(user); err != nil {
 		h.logger.Error("Error binding request payload", "error", err)
@@ -51,6 +52,7 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 }
 func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	h.logger.Info("Handling UpdateProduct request")
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		h.logger.Error("Invalid product ID", "error", err)
@@ -79,6 +81,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 }
 func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 	h.logger.Info("Handling DeleteProduct request")
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		h.logger.Error("Invalid product ID", "error", err)
@@ -108,6 +111,7 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 
 func (h *ProductHandler) GetAllProducts(c echo.Context) error {
 	h.logger.Info("Handling GetAllProducts request")
+
 	products, err := h.productService.GetAll()
 	if err != nil {
 		h.logger.Error("Failed to fetch products", "error", err)

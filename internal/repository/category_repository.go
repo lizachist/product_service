@@ -13,7 +13,7 @@ func NewCategoryRepository(database *sql.DB) domain.CategoryRepository {
 	return &categoryRepository{db: database}
 }
 
-func (r *categoryRepository) GetAll() ([]domain.Category, error) {
+func (r *categoryRepository) GetAll() ([]*domain.Category, error) {
 	query := `SELECT id, name, created_at, updated_at FROM category`
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -21,13 +21,13 @@ func (r *categoryRepository) GetAll() ([]domain.Category, error) {
 	}
 	defer rows.Close()
 
-	var categories []domain.Category
+	var categories []*domain.Category
 	for rows.Next() {
 		var category domain.Category
 		if err := rows.Scan(&category.ID, &category.Name, &category.CreatedAt, &category.UpdatedAt); err != nil {
 			return nil, err
 		}
-		categories = append(categories, category)
+		categories = append(categories, &category)
 	}
 
 	if err := rows.Err(); err != nil {

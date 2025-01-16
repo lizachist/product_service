@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"product_service/internal/domain"
 )
 
@@ -111,4 +112,46 @@ func (r *productRepository) Delete(product *domain.Product) error {
 	}
 
 	return nil
+}
+
+func (r *productRepository) GetAll() ([]*domain.Product, error) {
+	query := `
+        SELECT id, name, price, quantity, description, category_id, is_active, created_at, updated_at
+        FROM products
+        ORDER BY id`
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("error querying products: %w", err)
+	}
+	defer rows.Close()
+
+	var products []*domain.Product
+
+	for rows.Next() {
+		var product domain.Product
+
+		err := rows.Scan(
+			&product.ID,
+			&product.Name,
+			&product.Price,
+			&product.Quantity,
+			&product.Description,
+			&product.CategoryID,
+			&product.IsActive,
+			&product.CreatedAt,
+			&product.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning product row: %w", err)
+		}
+
+		products = append(products, &product)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error after scanning rows: %w", err)
+	}
+
+	return products, nil
 }

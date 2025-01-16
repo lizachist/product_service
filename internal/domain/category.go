@@ -10,6 +10,11 @@ type Category struct {
 }
 
 type CategoryRepository interface {
-	GetAll() ([]Category, error)
+	GetAll() ([]*Category, error)
+	GetByID(id int) (*Category, error)
+}
+
+type CategoryService interface {
+	GetAll() ([]*Category, error)
 	GetByID(id int) (*Category, error)
 }
